@@ -3,6 +3,9 @@ import "../styles/loginPage.css";
 import "../styles/global.css";
 import "bootstrap/dist/css/bootstrap.css";
 import { Button, Form } from "react-bootstrap";
+import { useState } from "react";
+import axios from 'axios';
+import { setUserSession } from '../utils/session';
 
 export default function LoginPage() {
   return (
@@ -20,13 +23,15 @@ export default function LoginPage() {
                 className="form-control"
                 placeholder="Login"
                 style={{ marginTop: "0px" }}
+                onChange={(e) => setLogin(e.target.value)}
               />
               <Form.Control
                 type="password"
                 className="form-control"
                 placeholder="Hasło"
+                onChange={(e) => setPwd(e.target.value)}
               />
-              <Button className="w-100" style={{ marginTop: "20px" }}>
+              <Button className="w-100" style={{ marginTop: "20px" }} onClick={handleLogin}>
                 Zaloguj
               </Button>
             </form>
@@ -35,4 +40,20 @@ export default function LoginPage() {
       </div>
     </div>
   );
+}
+
+const [login, setLogin] = useState('')
+const [pwd, setPwd] = useState('')
+
+const handleLogin = () => {
+  axios.post(`http://localhost:4000/login`, { login: login, pwd: pwd }).then(response => {
+    if(response.data.auth){
+      setUserSession(response.data.token)
+      window.location = '/HomePage';
+    } else {
+      setUserSession(response.data.token)
+    }
+  }).catch(error => {
+    console.log(error)
+  });
 }
